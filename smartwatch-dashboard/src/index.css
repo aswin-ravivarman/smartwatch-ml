@@ -3,16 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --bg:     #080c14;
-  --panel:  #0d1424;
-  --border: #1a2540;
-  --accent: #00e5ff;
-  --green:  #00ff88;
-  --amber:  #ffb020;
-  --red:    #ff3d5a;
-  --purple: #9b6dff;
-  --muted:  #3a4a6b;
-  --text:   #c8d8f0;
+  --bg:     #f0f4ff;
+  --panel:  #ffffff;
+  --border: #dde3f0;
+  --accent: #0099cc;
+  --green:  #00a85a;
+  --amber:  #d97706;
+  --red:    #dc2626;
+  --purple: #7c3aed;
+  --muted:  #94a3b8;
+  --text:   #1e293b;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,16 +28,16 @@ body {
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+/* Subtle dot grid */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(0,229,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,229,255,0.02) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-image: radial-gradient(circle, #c7d2e8 1px, transparent 1px);
+  background-size: 28px 28px;
   pointer-events: none;
   z-index: 0;
+  opacity: 0.5;
 }
 
 .panel {
@@ -46,14 +46,16 @@ body::before {
   border-radius: 16px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
 }
 
+/* Top shimmer line — blue tint for light theme */
 .panel::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0,229,255,0.3), transparent);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0,153,204,0.4), transparent);
 }
 
 @keyframes pulse-ring {
@@ -75,14 +77,16 @@ body::before {
 
 .recharts-cartesian-grid-horizontal line,
 .recharts-cartesian-grid-vertical line {
-  stroke: rgba(26, 37, 64, 0.8) !important;
+  stroke: rgba(200, 210, 230, 0.8) !important;
 }
 
 .custom-tooltip {
-  background: #0d1424;
-  border: 1px solid #1a2540;
+  background: #ffffff;
+  border: 1px solid #dde3f0;
   border-radius: 8px;
   padding: 8px 12px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
+  color: #1e293b;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }

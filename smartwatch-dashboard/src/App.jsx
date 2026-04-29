@@ -52,7 +52,7 @@ export default function App() {
   useTick()
   const { data, connected } = useLatest()
   const history  = useHistory(40)
-  const ml       = useML()
+  const ml = useML(data)
   const fall     = useFallAlert()
 
   const hr     = data?.heartRate   ?? 0
@@ -74,7 +74,7 @@ export default function App() {
   const stressSpark = history.map(d => ({ v: d.stressScore }))
 
   return (
-    <div className="relative min-h-screen bg-bg z-10">
+    <div className="relative min-h-screen z-10" style={{ background: '#f0f4ff' }}>
       <div className="max-w-6xl mx-auto px-4 py-6">
 
         <StatusBar connected={connected} data={data} />

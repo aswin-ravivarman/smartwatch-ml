@@ -7,8 +7,7 @@ const db = admin.database()
 
 // ── FILL IN your ML backend URL here ──────────────────────────────
 // Render.com / Railway free tier URL after deploying ml-backend/
-const ML_ENDPOINT = 'https://YOUR-ML-BACKEND.onrender.com/predict'
-
+const ML_ENDPOINT = 'https://smartwatch-ml.onrender.com/predict'
 // Trigger: fires every time /devices/{deviceId}/latest is written
 exports.runMLPrediction = functions
   .database.ref('/devices/{deviceId}/latest')
