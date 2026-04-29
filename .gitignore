@@ -14,3 +14,10 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Environment variables - DO NOT COMMIT
+.env
+.env.local
+
+# Firebase config with credentials
+smartwatch-dashboard/src/lib/firebase.js
