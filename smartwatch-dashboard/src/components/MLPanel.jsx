@@ -12,7 +12,8 @@ export default function MLPanel({ ml }) {
   const risk    = riskStyle[ml?.riskLevel ?? 'unknown']
   const RIcon   = risk.Icon
   const conf    = ml?.confidence ?? 0
-  const disease = ml?.disease ?? 'Awaiting data...'
+  const disease = ml?.disease    ?? 'Awaiting data...'
+  const source  = ml?.source     ?? null   // 'server' | 'local' | null
 
   return (
     <motion.div
@@ -21,13 +22,17 @@ export default function MLPanel({ ml }) {
       className="panel p-5 flex flex-col gap-4"
       style={{ borderColor: risk.color + '44' }}
     >
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-[#9b6dff]/10 flex items-center justify-center">
             <Brain size={15} className="text-[#9b6dff]" />
           </div>
-          <span className="font-display text-xs uppercase tracking-widest text-[#3a4a6b]">ML Prediction</span>
+          <span className="font-display text-xs uppercase tracking-widest text-[#3a4a6b]">
+            ML Prediction
+          </span>
         </div>
+
         <AnimatePresence mode="wait">
           <motion.div
             key={ml?.riskLevel}
@@ -43,6 +48,7 @@ export default function MLPanel({ ml }) {
         </AnimatePresence>
       </div>
 
+      {/* Disease label */}
       <AnimatePresence mode="wait">
         <motion.div
           key={disease}
@@ -56,6 +62,7 @@ export default function MLPanel({ ml }) {
         </motion.div>
       </AnimatePresence>
 
+      {/* Confidence bar */}
       <div className="flex flex-col gap-1.5">
         <div className="flex justify-between text-xs font-mono text-[#3a4a6b]">
           <span>Confidence</span>
@@ -72,11 +79,36 @@ export default function MLPanel({ ml }) {
         </div>
       </div>
 
-      {ml?.ts && (
-        <p className="text-xs font-mono text-[#3a4a6b]">
-          Updated: {new Date(ml.ts).toLocaleTimeString()}
-        </p>
-      )}
+      {/* Footer — timestamp + model source */}
+      <div className="flex items-center justify-between">
+        {ml?.ts ? (
+          <p className="text-xs font-mono text-[#3a4a6b]">
+            Updated: {new Date(ml.ts).toLocaleTimeString()}
+          </p>
+        ) : (
+          <span />
+        )}
+
+        {/* Source badge — shows which engine produced the result */}
+        <AnimatePresence mode="wait">
+          {source && (
+            <motion.span
+              key={source}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{    opacity: 0 }}
+              className="text-xs font-mono px-2 py-0.5 rounded-full"
+              style={
+                source === 'server'
+                  ? { background: '#9b6dff18', color: '#9b6dff', border: '1px solid #9b6dff44' }
+                  : { background: '#3a4a6b44', color: '#3a4a6b',  border: '1px solid #3a4a6b44' }
+              }
+            >
+              {source === 'server' ? '⚡ Random Forest' : '⚙ Local rules'}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.div>
   )
 }
