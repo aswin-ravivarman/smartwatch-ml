@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import {
   ComposedChart, Line, Area, XAxis, YAxis,
   CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -18,10 +19,14 @@ function CustomTooltip({ active, payload }) {
   )
 }
 
-export default function HistoryChart({ data }) {
+// PERF FIX: React.memo prevents re-renders when parent ticks but data is unchanged
+const HistoryChart = memo(function HistoryChart({ data }) {
   const formatted = data.map(d => ({
     ...d,
     time: d.ts ? dayjs(d.ts).format('HH:mm') : '',
+    // BUGFIX: replace 0 (off-wrist) with null so connectNulls skips gaps cleanly
+    heartRate: d.heartRate > 0 ? d.heartRate : null,
+    spo2:      d.spo2 > 0      ? d.spo2      : null,
   }))
 
   return (
@@ -46,10 +51,14 @@ export default function HistoryChart({ data }) {
           </linearGradient>
         </defs>
         <Area yAxisId="hr" type="monotone" dataKey="heartRate" name="HR (bpm)"
-          stroke="#00e5ff" strokeWidth={2} fill="url(#hrGrad)" dot={false} isAnimationActive={false} />
+          stroke="#00e5ff" strokeWidth={2} fill="url(#hrGrad)" dot={false}
+          isAnimationActive={false} connectNulls />
         <Line yAxisId="spo2" type="monotone" dataKey="spo2" name="SpO₂ (%)"
-          stroke="#00ff88" strokeWidth={2} dot={false} isAnimationActive={false} />
+          stroke="#00ff88" strokeWidth={2} dot={false}
+          isAnimationActive={false} connectNulls />
       </ComposedChart>
     </ResponsiveContainer>
   )
-}
+})
+
+export default HistoryChart

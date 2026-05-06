@@ -2,11 +2,11 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { subscribeLatest, subscribeHistory, subscribeFall } from '../lib/firebase'
 import toast from 'react-hot-toast'
 
-const ML_ENDPOINT = 'https://smartwatch-ml.onrender.com/predict'
+const ML_ENDPOINT    = 'https://smartwatch-ml.onrender.com/predict'
 const ML_INTERVAL_MS = 15000
 const KEEP_ALIVE_MS  = 9 * 60 * 1000   // ping every 9 min to prevent cold start
 
-// ─── local rule-based fallback (runs instantly, no server needed) ───────────
+// ─── local rule-based fallback ───────────────────────────────────────────────
 function ruleBased(data) {
   const hr   = data.heartRate   ?? 75
   const spo2 = data.spo2        ?? 97
@@ -54,17 +54,19 @@ export function useHistory(n = 40) {
 // ─── useML ───────────────────────────────────────────────────────────────────
 export function useML(data) {
   const [ml, setML]         = useState(null)
-  const [source, setSource] = useState(null)   // 'server' | 'local'
+  const [source, setSource] = useState(null)
   const prevDisease         = useRef(null)
   const lastCall            = useRef(0)
 
-  // ── keep-alive: ping /health every 9 min so Render never cold-starts ──────
+  // PERF FIX: keep-alive skips ping when tab is hidden / screen off
   useEffect(() => {
-    const ping = () =>
+    const ping = () => {
+      if (document.visibilityState !== 'visible') return   // skip on hidden tab
       fetch(`${ML_ENDPOINT.replace('/predict', '/health')}`, { method: 'GET' })
-        .catch(() => {})   // silent
+        .catch(() => {})
+    }
 
-    ping()   // ping immediately on mount to wake server early
+    ping()
     const id = setInterval(ping, KEEP_ALIVE_MS)
     return () => clearInterval(id)
   }, [])
@@ -86,7 +88,6 @@ export function useML(data) {
       fallDetected: data.fallDetected ? 1 : 0,
     }
 
-    // Show local result immediately while server request is in-flight
     const local = ruleBased(data)
     setML({ ...local, ts: Date.now(), source: 'local' })
     setSource('local')
@@ -95,7 +96,7 @@ export function useML(data) {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(features),
-      signal:  AbortSignal.timeout(10000),   // give up after 10 s
+      signal:  AbortSignal.timeout(10000),
     })
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
@@ -112,7 +113,6 @@ export function useML(data) {
         setML(mlData)
         setSource('server')
 
-        // toast only on disease change
         if (result.disease !== prevDisease.current && result.disease !== 'Normal') {
           if (result.risk_level === 'high') {
             toast.error(
@@ -126,12 +126,11 @@ export function useML(data) {
         }
       })
       .catch(() => {
-        // server unreachable → stay with local result, no noisy toast
         setSource('local')
       })
   }, [data])
 
-  return ml   // has .source field so MLPanel can show "RF model" vs "local rules"
+  return ml
 }
 
 // ─── useFallAlert ─────────────────────────────────────────────────────────

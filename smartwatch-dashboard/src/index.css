@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Theme variables ── */
 :root {
   --bg:     #f0f4ff;
   --panel:  #ffffff;
@@ -13,6 +14,30 @@
   --purple: #7c3aed;
   --muted:  #94a3b8;
   --text:   #1e293b;
+  --text2:  #3a4a6b;
+  --vitals-value: #1e293b;
+  --panel-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+}
+
+[data-theme="dark"] {
+  /* Background: a warm mid-tone slate — not black, not navy */
+  --bg:     #1c2333;
+  /* Panels sit clearly above the background */
+  --panel:  #252f42;
+  /* Borders are visible but soft */
+  --border: #3a4a63;
+  /* Accent colors stay vivid but slightly softened */
+  --accent: #38bdf8;
+  --green:  #34d399;
+  --amber:  #fbbf24;
+  --red:    #f87171;
+  --purple: #a78bfa;
+  --muted:  #64748b;
+  /* Text is off-white — not glaring pure white */
+  --text:   #e2e8f0;
+  --text2:  #94a3b8;
+  --vitals-value: #f1f5f9;
+  --panel-shadow: 0 1px 4px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.15);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,18 +47,18 @@ body {
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
   overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* Subtle dot grid */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(circle, #c7d2e8 1px, transparent 1px);
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
   background-size: 28px 28px;
   pointer-events: none;
   z-index: 0;
@@ -46,10 +71,10 @@ body::before {
   border-radius: 16px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  box-shadow: var(--panel-shadow);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-/* Top shimmer line — blue tint for light theme */
 .panel::before {
   content: '';
   position: absolute;
@@ -70,23 +95,82 @@ body::before {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.3; }
 }
+@keyframes fall-shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px) rotate(-1deg); }
+  40%       { transform: translateX(8px) rotate(1deg); }
+  60%       { transform: translateX(-5px); }
+  80%       { transform: translateX(5px); }
+}
+@keyframes fall-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,61,90,0.5); }
+  50%       { box-shadow: 0 0 0 20px rgba(255,61,90,0); }
+}
 
 .pulse-ring  { animation: pulse-ring 2s ease-out infinite; }
 .beat-anim   { animation: beat 0.8s ease-in-out infinite; }
 .blink       { animation: blink 1.2s ease-in-out infinite; }
+.fall-shake  { animation: fall-shake 0.5s ease-in-out; }
+.fall-pulse  { animation: fall-pulse 1.5s ease-in-out infinite; }
 
 .recharts-cartesian-grid-horizontal line,
 .recharts-cartesian-grid-vertical line {
-  stroke: rgba(200, 210, 230, 0.8) !important;
+  stroke: var(--border) !important;
+  opacity: 0.8;
 }
 
+.recharts-text { fill: var(--text2) !important; }
+
 .custom-tooltip {
-  background: #ffffff;
-  border: 1px solid #dde3f0;
+  background: var(--panel);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 12px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
-  color: #1e293b;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  color: var(--text);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Metric card clickable */
+.metric-card-clickable {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.metric-card-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+.metric-card-clickable:active {
+  transform: translateY(0px);
+}
+
+/* Theme toggle */
+.theme-toggle {
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s;
+  border: none;
+  outline: none;
+}
+.theme-toggle.dark {
+  background: var(--accent);
+}
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.3s;
+}
+.theme-toggle.dark::after {
+  transform: translateX(18px);
 }
